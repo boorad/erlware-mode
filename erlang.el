@@ -4627,18 +4627,21 @@ There exists two workarounds for this bug:
         (inferior-erlang)))
   (or (inferior-erlang-running-p)
       (error "Error starting inferior Erlang shell"))
-  (let ((outdir (concat (file-name-directory (buffer-file-name)) erlang-compile-outdir))
-        ;;; (file (file-name-nondirectory (buffer-file-name)))
-        (noext (substring (buffer-file-name) 0 -4))
-        ;; Hopefully, noone else will ever use these...
-        (tmpvar "Tmp7236")
-        (tmpvar2 "Tmp8742")
-        end)
+  (let* (
+         (buffer-dir (file-name-directory (buffer-file-name)))
+         (outdir (concat buffer-dir erlang-compile-outdir))
+         (dir (if (file-readable-p outdir) outdir buffer-dir))
+         ;; (file (file-name-nondirectory (buffer-file-name)))
+         (noext (substring (buffer-file-name) 0 -4))
+         ;; Hopefully, noone else will ever use these...
+         (tmpvar "Tmp7236")
+         (tmpvar2 "Tmp8742")
+         end)
     (inferior-erlang-display-buffer)
     (inferior-erlang-wait-prompt)
     (setq end (inferior-erlang-send-command
                (if erlang-compile-use-outdir
-                   (format "c(\"%s\", [{outdir, \"%s\"}])." noext outdir)
+                   (format "c(\"%s\", [{outdir, \"%s\"}])." noext dir)
                  (format
                   (concat
                    "f(%s), {ok, %s} = file:get_cwd(), "
