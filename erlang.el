@@ -508,18 +508,18 @@ containing the man page.  Use this variable when the default
 function, `erlang-man-display', does not work on your system.")
 
 (eval-and-compile
-  (defconst erlang-atom-quoted-regexp 
+  (defconst erlang-atom-quoted-regexp
     "'\\(?:[^\\']?\\(?:\\\\'\\)?\\)*'"
     "Regexp describing a single-quoted atom"))
 
 (eval-and-compile
-  (defconst erlang-atom-regular-regexp 
+  (defconst erlang-atom-regular-regexp
     "\\(?:[a-z][A-Za-z0-9_]*\\)"
     "Regexp describing a regular (non-quoted) atom"))
 
 (eval-and-compile
-  (defconst erlang-atom-regexp 
-    (concat"\\(" erlang-atom-quoted-regexp "\\|" 
+  (defconst erlang-atom-regexp
+    (concat"\\(" erlang-atom-quoted-regexp "\\|"
            erlang-atom-regular-regexp "\\)")
     "Regexp describing an Erlang atom."))
 
@@ -540,7 +540,7 @@ This is used to determine matches in complex regexps which contains
 `erlang-variable-regexp'.")
 
 (defconst erlang-bif-regexp
-  (concat 
+  (concat
    "\\("
    "a\\(bs\\|live\\|pply\\|tom_to_list\\)\\|"
    "binary_to_\\(list\\|term\\)\\|"
@@ -583,7 +583,7 @@ The matches all except the extension.  This is useful if the Erlang
 tags system should interpret tags on the form `module:tag' for
 files written in other languages than Erlang.")
 
-(defvar erlang-mode-map 
+(defvar erlang-mode-map
   (let ((map (make-sparse-keymap)))
     (unless (boundp 'indent-line-function)
       (define-key map "\t"        'erlang-indent-command))
@@ -4631,6 +4631,7 @@ There exists two workarounds for this bug:
          (buffer-dir (file-name-directory (buffer-file-name)))
          (outdir (concat buffer-dir erlang-compile-outdir))
          (dir (if (file-readable-p outdir) outdir buffer-dir))
+         (incl (concat buffer-dir "../include"))
          ;; (file (file-name-nondirectory (buffer-file-name)))
          (noext (substring (buffer-file-name) 0 -4))
          ;; Hopefully, noone else will ever use these...
@@ -4641,7 +4642,8 @@ There exists two workarounds for this bug:
     (inferior-erlang-wait-prompt)
     (setq end (inferior-erlang-send-command
                (if erlang-compile-use-outdir
-                   (format "c(\"%s\", [{outdir, \"%s\"}])." noext dir)
+                   (format "c(\"%s\", [{outdir, \"%s\"},{i,\"%s\"}])."
+                           noext dir incl)
                  (format
                   (concat
                    "f(%s), {ok, %s} = file:get_cwd(), "
